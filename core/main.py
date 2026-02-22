@@ -1,4 +1,5 @@
-from fastapi import FastAPI,Depends
+from fastapi.security import APIKeyHeader
+from fastapi import FastAPI, Depends
 from contextlib import asynccontextmanager
 from tasks.routes import router as tasks_routes
 from users.routes import router as users_routes
@@ -40,8 +41,8 @@ app.include_router(tasks_routes)
 app.include_router(users_routes)
 
 
+header_schema = APIKeyHeader(name='x-key')
 
-from auth.basic_auth import get_authenticate_user
 
 @app.get('/public')
 def public_rouet():
@@ -49,6 +50,6 @@ def public_rouet():
 
 
 @app.get('/private')
-def private_route(user: UserModel = Depends(get_authenticate_user)):
-    print(user)
+def private_route(api_key=Depends(header_schema)):
+    print(api_key)
     return {'message': 'This is is private route.'}
