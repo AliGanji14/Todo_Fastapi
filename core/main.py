@@ -1,4 +1,4 @@
-from auth.token_auth import get_authenticate_user
+from auth.jwt_auth import get_authenticate_user
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import FastAPI, Depends
 from contextlib import asynccontextmanager
@@ -49,5 +49,5 @@ def public_rouet():
 
 @app.get('/private')
 def private_route(user=Depends(get_authenticate_user)):
-    print(user)
+    print(user.id)
     return {'message': 'This is is private route.'}
