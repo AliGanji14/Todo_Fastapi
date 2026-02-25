@@ -18,6 +18,10 @@ class UserRegisterSchema(BaseModel):
 
     @field_validator('password_confirm')
     def check_passwords_match(cls, password_confirm, validation):
-        if not password_confirm== validation.data.get('password'):
+        if not password_confirm == validation.data.get('password'):
             raise ValueError('password dosent match')
         return password_confirm
+
+
+class UserRefreshTokenSchema(BaseModel):
+    token: str = Field(..., description='refresh token of the user')
