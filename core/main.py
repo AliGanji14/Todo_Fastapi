@@ -1,3 +1,4 @@
+from fastapi_swagger import patch_fastapi
 from auth.jwt_auth import get_authenticate_user
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import FastAPI, Depends, Response, Request
@@ -25,7 +26,9 @@ async def lifespan(app: FastAPI):
     yield
     print('Application shutdown')
 
-app = FastAPI(title="Todo Application",
+app = FastAPI(docs_url=None,
+              swagger_ui_oauth2_redirect_url=None,
+              title="Todo Application",
               description='this is a section for description',
               version="0.0.1",
               terms_of_service="http://example.com/terms/",
@@ -36,8 +39,10 @@ app = FastAPI(title="Todo Application",
               },
               license_info={
                   "name": "MIT",
-              }, lifespan=lifespan, openapi_tags=tags_metadata)
-
+              },
+              lifespan=lifespan,
+              openapi_tags=tags_metadata)
+patch_fastapi(app)
 app.include_router(tasks_routes)
 app.include_router(users_routes)
 
