@@ -1,11 +1,10 @@
 from fastapi_swagger import patch_fastapi
-from auth.jwt_auth import get_authenticate_user
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import FastAPI, Depends, Response, Request
+from fastapi import FastAPI, Response, Request
 from contextlib import asynccontextmanager
 from tasks.routes import router as tasks_routes
 from users.routes import router as users_routes
-from users.models import UserModel
+from fastapi.middleware.cors import CORSMiddleware
+import time
 
 
 tags_metadata = [
@@ -57,3 +56,22 @@ def set_cookie(response: Response):
 def set_cookie(request: Request):
     print(request.cookies.get('test'))
     return {'message': 'cookie has been set successfully.'}
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time()  # زمان شروع پردازش درخواست
+    response = await call_next(request)  # پردازش درخواست توسط FastAPI
+    process_time = time.perf_counter() - start_time  # مدت زمان پردازش محاسبه شود
+    # اضافه کردن هدر به پاسخ
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_method=['*'],
+    allow_headers=['*'],
+)
